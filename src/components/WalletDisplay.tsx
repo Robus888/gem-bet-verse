@@ -40,11 +40,18 @@ export const WalletDisplay = () => {
     };
   }, []);
 
+  const handleAddFunds = () => {
+    window.open('https://discord.gg/ytncnjTD', '_blank');
+  };
+
   return (
     <div className="bg-gray-800 p-2 rounded-lg flex items-center space-x-2">
       <span className="animate-fadeIn">{balance.toFixed(2)}</span>
       <FontAwesomeIcon icon={faCrown} className="text-yellow-500" />
-      <button className="bg-yellow-500 text-gray-900 px-2 py-1 rounded-lg hover:bg-yellow-400 transition-colors">
+      <button 
+        onClick={handleAddFunds}
+        className="bg-yellow-500 text-gray-900 px-2 py-1 rounded-lg hover:bg-yellow-400 transition-colors"
+      >
         +
       </button>
     </div>
