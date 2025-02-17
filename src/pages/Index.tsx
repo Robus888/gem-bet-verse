@@ -4,6 +4,7 @@ import { WalletDisplay } from '@/components/WalletDisplay';
 import { AuthButton } from '@/components/AuthButton';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import { ProfileDisplay } from '@/components/ProfileDisplay';
 
 const Index = () => {
   const [showCredits, setShowCredits] = useState(false);
@@ -21,6 +22,7 @@ const Index = () => {
             <FontAwesomeIcon icon={faLink} className="text-yellow-500 text-2xl" />
           </div>
           <div className="flex items-center space-x-2">
+            <ProfileDisplay />
             <AuthButton />
             <WalletDisplay />
             <div className="bg-gray-800 p-2 rounded-lg flex items-center space-x-2">

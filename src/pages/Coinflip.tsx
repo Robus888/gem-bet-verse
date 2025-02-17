@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -41,7 +40,7 @@ const Coinflip = () => {
       // Check user's balance
       const { data: wallet } = await supabase
         .from('wallets')
-        .select('balance')
+        .select('balance, total_wagered')
         .eq('user_id', user.id)
         .single();
 
@@ -66,13 +65,12 @@ const Coinflip = () => {
       const won = Math.random() < 0.5;
       const wonAmount = won ? betAmount * 2 : 0;
 
-      // Update wallet balance
+      // Update wallet balance and total wagered
       await supabase
         .from('wallets')
         .update({ 
           balance: wallet.balance - betAmount + wonAmount,
-          total_wagered: (wallet.total_wagered || 0) + betAmount,
-          total_games: (wallet.total_games || 0) + 1
+          total_wagered: (wallet.total_wagered || 0) + betAmount
         })
         .eq('user_id', user.id);
 

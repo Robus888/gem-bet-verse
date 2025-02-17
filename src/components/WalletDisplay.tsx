@@ -5,12 +5,14 @@ import { faCrown } from '@fortawesome/free-solid-svg-icons';
 import { supabase } from '@/lib/supabase';
 
 export const WalletDisplay = () => {
-  const [balance, setBalance] = useState<number>(0);
+  const [balance, setBalance] = useState<number | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const fetchBalance = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        setIsAuthenticated(true);
         const { data: wallet } = await supabase
           .from('wallets')
           .select('balance')
@@ -20,6 +22,8 @@ export const WalletDisplay = () => {
         if (wallet) {
           setBalance(wallet.balance);
         }
+      } else {
+        setIsAuthenticated(false);
       }
     };
 
@@ -44,9 +48,11 @@ export const WalletDisplay = () => {
     window.open('https://discord.gg/ytncnjTD', '_blank');
   };
 
+  if (!isAuthenticated) return null;
+
   return (
     <div className="bg-gray-800 p-2 rounded-lg flex items-center space-x-2">
-      <span className="animate-fadeIn">{balance.toFixed(2)}</span>
+      <span className="animate-fadeIn">{balance?.toFixed(2) ?? '0.00'}</span>
       <FontAwesomeIcon icon={faCrown} className="text-yellow-500" />
       <button 
         onClick={handleAddFunds}
