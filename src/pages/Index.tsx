@@ -1,3 +1,4 @@
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLink, faHome, faBars, faCoins, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { WalletDisplay } from '@/components/WalletDisplay';
@@ -19,8 +20,9 @@ const Index = () => {
     <div className="min-h-screen bg-gray-900 text-white relative">
       <div className="p-4">
         <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center">
+          <div className="flex items-center space-x-2">
             <FontAwesomeIcon icon={faLink} className="text-yellow-500 text-2xl" />
+            <h1 className="text-xl font-bold text-white">Wager Wizard</h1>
           </div>
           <div className="flex items-center space-x-2">
             <ProfileDisplay />
