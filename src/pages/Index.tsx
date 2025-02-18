@@ -13,7 +13,7 @@ const Index = () => {
   const [showMenu, setShowMenu] = useState(false);
 
   const handleDiscordClick = () => {
-    window.open('https://discord.gg/your-discord-link', '_blank');
+    window.open('https://discord.gg/ekyfYnbA', '_blank');
   };
 
   return (
@@ -22,7 +22,7 @@ const Index = () => {
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center space-x-2">
             <FontAwesomeIcon icon={faLink} className="text-yellow-500 text-2xl" />
-            <h1 className="text-xl font-bold text-white">Wager Wizard</h1>
+            <h1 className="text-xl font-bold text-white">Gem Hustlers Casino</h1>
           </div>
           <div className="flex items-center space-x-2">
             <ProfileDisplay />
@@ -83,8 +83,8 @@ const Index = () => {
               </button>
             </div>
             <div className="space-y-2">
-              <p className="text-gray-300">Owner: talkwithal</p>
-              <p className="text-gray-300">Developer: talkwithal</p>
+              <p className="text-gray-300">Owner: leone2008dogg</p>
+              <p className="text-gray-300">Developer: Elmejorsiuuu</p>
             </div>
           </div>
         </div>
