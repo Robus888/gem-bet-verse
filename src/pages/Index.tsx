@@ -5,6 +5,7 @@ import { AuthButton } from '@/components/AuthButton';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { ProfileDisplay } from '@/components/ProfileDisplay';
+import { AdminPanel } from '@/components/AdminPanel';
 
 const Index = () => {
   const [showCredits, setShowCredits] = useState(false);
@@ -137,6 +138,7 @@ const Index = () => {
           <FontAwesomeIcon icon={faCoins} className="text-gray-500 text-2xl" />
           <span className="text-sm">Credits</span>
         </button>
+        <AdminPanel />
       </div>
     </div>
   );
