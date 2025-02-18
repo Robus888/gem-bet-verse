@@ -70,7 +70,6 @@ const Index = () => {
             </div>
           </Link>
         </div>
-
       </div>
 
       {/* Credits Modal */}
