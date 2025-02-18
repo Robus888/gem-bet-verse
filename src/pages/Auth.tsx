@@ -14,7 +14,7 @@ const Auth = () => {
   const handleAuth = async (type: 'login' | 'signup') => {
     try {
       setIsLoading(true);
-      const email = `${username}@wagerwizard.com`;
+      const email = `${username}@gemhustlers.com`;
       
       if (type === 'signup') {
         const { error } = await supabase.auth.signUp({
@@ -30,7 +30,7 @@ const Auth = () => {
         if (error) throw error;
         toast({
           title: "Account created!",
-          description: "Welcome to Wager Wizard!",
+          description: "Welcome to  Gem Hustlers Casino!",
         });
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -57,7 +57,7 @@ const Auth = () => {
     <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8 p-6 bg-gray-800 rounded-xl">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-white">Welcome to Wager Wizard</h2>
+          <h2 className="text-3xl font-bold text-white">Welcome to Gem Hustlers Casino</h2>
           <p className="mt-2 text-gray-400">Enter your credentials to continue</p>
         </div>
         
