@@ -45,7 +45,7 @@ export const WalletDisplay = () => {
   }, []);
 
   const handleAddFunds = () => {
-    window.open('https://discord.gg/ytncnjTD', '_blank');
+    window.open('https://discord.gg/ekyfYnbA', '_blank');
   };
 
   if (!isAuthenticated) return null;
