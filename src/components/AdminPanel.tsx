@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from "@/hooks/use-toast";
 
@@ -73,20 +73,20 @@ export const AdminPanel = () => {
     }
   };
 
-  const checkAdmin = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-    const { data } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
+      const { data } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single();
 
-    setIsAdmin(data?.is_admin || false);
-  };
+      setIsAdmin(data?.is_admin || false);
+    };
 
-  useState(() => {
     checkAdmin();
   }, []);
 
