@@ -9,38 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      events: {
-        Row: {
-          ended_at: string | null
-          host_id: string
-          id: string
-          is_active: boolean | null
-          started_at: string
-        }
-        Insert: {
-          ended_at?: string | null
-          host_id: string
-          id?: string
-          is_active?: boolean | null
-          started_at?: string
-        }
-        Update: {
-          ended_at?: string | null
-          host_id?: string
-          id?: string
-          is_active?: boolean | null
-          started_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "events_host_id_fkey"
-            columns: ["host_id"]
-            isOneToOne: false
-            referencedRelation: "host_accounts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       game_history: {
         Row: {
           bet_amount: number
@@ -105,76 +73,6 @@ export type Database = {
           status?: string
           winner_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "games_creator_id_fkey"
-            columns: ["creator_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "games_joiner_id_fkey"
-            columns: ["joiner_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "games_winner_id_fkey"
-            columns: ["winner_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      host_accounts: {
-        Row: {
-          created_at: string
-          current_event_id: string | null
-          id: string
-          is_active: boolean | null
-          password: string
-          username: string
-        }
-        Insert: {
-          created_at?: string
-          current_event_id?: string | null
-          id?: string
-          is_active?: boolean | null
-          password: string
-          username: string
-        }
-        Update: {
-          created_at?: string
-          current_event_id?: string | null
-          id?: string
-          is_active?: boolean | null
-          password?: string
-          username?: string
-        }
-        Relationships: []
-      }
-      keys: {
-        Row: {
-          created_at: string
-          expiration_date: string | null
-          is_active: boolean | null
-          key: string
-        }
-        Insert: {
-          created_at?: string
-          expiration_date?: string | null
-          is_active?: boolean | null
-          key: string
-        }
-        Update: {
-          created_at?: string
-          expiration_date?: string | null
-          is_active?: boolean | null
-          key?: string
-        }
         Relationships: []
       }
       players: {
@@ -204,89 +102,6 @@ export type Database = {
         }
         Relationships: []
       }
-      profiles: {
-        Row: {
-          created_at: string
-          early_access: boolean | null
-          id: string
-          is_admin: boolean | null
-          username: string | null
-        }
-        Insert: {
-          created_at?: string
-          early_access?: boolean | null
-          id: string
-          is_admin?: boolean | null
-          username?: string | null
-        }
-        Update: {
-          created_at?: string
-          early_access?: boolean | null
-          id?: string
-          is_admin?: boolean | null
-          username?: string | null
-        }
-        Relationships: []
-      }
-      ranks: {
-        Row: {
-          abbreviation: string | null
-          category: string
-          created_at: string | null
-          display_order: number
-          id: string
-          name: string
-        }
-        Insert: {
-          abbreviation?: string | null
-          category: string
-          created_at?: string | null
-          display_order: number
-          id?: string
-          name: string
-        }
-        Update: {
-          abbreviation?: string | null
-          category?: string
-          created_at?: string | null
-          display_order?: number
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
-      upgrades: {
-        Row: {
-          created_at: string | null
-          id: string
-          level: number | null
-          player_id: string | null
-          upgrade_name: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          level?: number | null
-          player_id?: string | null
-          upgrade_name: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          level?: number | null
-          player_id?: string | null
-          upgrade_name?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "upgrades_player_id_fkey"
-            columns: ["player_id"]
-            isOneToOne: false
-            referencedRelation: "players"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       wallets: {
         Row: {
           balance: number
@@ -310,41 +125,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
-      }
-      website_content: {
-        Row: {
-          content: string
-          id: string
-          key: string
-          last_updated_at: string
-          last_updated_by: string | null
-          section: string | null
-        }
-        Insert: {
-          content: string
-          id?: string
-          key: string
-          last_updated_at?: string
-          last_updated_by?: string | null
-          section?: string | null
-        }
-        Update: {
-          content?: string
-          id?: string
-          key?: string
-          last_updated_at?: string
-          last_updated_by?: string | null
-          section?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "website_content_last_updated_by_fkey"
-            columns: ["last_updated_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Views: {
