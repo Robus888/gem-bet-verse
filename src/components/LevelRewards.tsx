@@ -51,6 +51,15 @@ export const LevelRewards = ({ onClose }: { onClose: () => void }) => {
 
       const reward = getLevelReward(currentLevel);
 
+      // Get current wallet
+      const { data: currentWallet } = await supabase
+        .from('wallets')
+        .select('balance')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!currentWallet) throw new Error('Wallet not found');
+
       // Record the claim
       const { error: rewardError } = await supabase
         .from('level_rewards')
@@ -62,11 +71,11 @@ export const LevelRewards = ({ onClose }: { onClose: () => void }) => {
 
       if (rewardError) throw rewardError;
 
-      // Update wallet
+      // Update wallet with new balance
       const { error: walletError } = await supabase
         .from('wallets')
         .update({
-          balance: supabase.sql`balance + ${reward}`,
+          balance: currentWallet.balance + reward,
           last_reward_claim: new Date().toISOString()
         })
         .eq('user_id', user.id);
