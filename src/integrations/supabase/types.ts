@@ -102,6 +102,24 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          id: string
+          is_admin: boolean | null
+          username: string
+        }
+        Insert: {
+          id: string
+          is_admin?: boolean | null
+          username: string
+        }
+        Update: {
+          id?: string
+          is_admin?: boolean | null
+          username?: string
+        }
+        Relationships: []
+      }
       wallets: {
         Row: {
           balance: number
