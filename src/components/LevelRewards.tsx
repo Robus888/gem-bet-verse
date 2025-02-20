@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from "@/hooks/use-toast";
 import { getLevelReward } from '@/utils/levelUtils';
 import { format } from 'date-fns';
+import { formatNumber } from '@/utils/formatNumber';
 
 export const LevelRewards = ({ onClose }: { onClose: () => void }) => {
   const [currentLevel, setCurrentLevel] = useState(0);
@@ -112,7 +112,7 @@ export const LevelRewards = ({ onClose }: { onClose: () => void }) => {
           <div className="bg-gray-700 p-4 rounded-lg">
             <div className="text-lg mb-2">Current Level: {currentLevel}</div>
             <div className="text-sm text-gray-300">
-              Daily Reward: {getLevelReward(currentLevel).toLocaleString()} credits
+              Daily Reward: {formatNumber(getLevelReward(currentLevel))} credits
             </div>
             {lastClaim && (
               <div className="text-sm text-gray-400">

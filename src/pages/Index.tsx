@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLink, faHome, faBars, faCoins, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faLink, faHome, faBars, faCoins, faTimes, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { WalletDisplay } from '@/components/WalletDisplay';
 import { AuthButton } from '@/components/AuthButton';
 import { Link } from 'react-router-dom';
@@ -7,11 +7,13 @@ import { useState } from 'react';
 import { ProfileDisplay } from '@/components/ProfileDisplay';
 import { AdminPanel } from '@/components/AdminPanel';
 import { LevelRewards } from '@/components/LevelRewards';
+import { Leaderboard } from '@/components/Leaderboard';
 
 const Index = () => {
   const [showCredits, setShowCredits] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showLevelRewards, setShowLevelRewards] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const handleDiscordClick = () => {
     window.open('https://discord.gg/ekyfYnbA', '_blank');
@@ -127,14 +129,27 @@ const Index = () => {
                 <FontAwesomeIcon icon={faCoins} className="text-yellow-500" />
                 <span>Level Rewards</span>
               </button>
+              <button 
+                onClick={() => {
+                  setShowMenu(false);
+                  setShowLeaderboard(true);
+                }}
+                className="w-full flex items-center space-x-3 px-4 py-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                <FontAwesomeIcon icon={faTrophy} className="text-yellow-500" />
+                <span>Leaderboard</span>
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Level Rewards Modal */}
       {showLevelRewards && (
         <LevelRewards onClose={() => setShowLevelRewards(false)} />
+      )}
+
+      {showLeaderboard && (
+        <Leaderboard onClose={() => setShowLeaderboard(false)} />
       )}
 
       <div className="fixed bottom-0 left-0 right-0 bg-gray-800 p-4 flex justify-around">

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCrown } from '@fortawesome/free-solid-svg-icons';
 import { supabase } from '@/lib/supabase';
+import { formatNumber } from '@/utils/formatNumber';
 
 export const WalletDisplay = () => {
   const [balance, setBalance] = useState<number | null>(null);
@@ -52,7 +53,7 @@ export const WalletDisplay = () => {
 
   return (
     <div className="bg-gray-800 p-2 rounded-lg flex items-center space-x-2">
-      <span className="animate-fadeIn">{balance?.toFixed(2) ?? '0.00'}</span>
+      <span className="animate-fadeIn">{balance ? formatNumber(balance) : '0'}</span>
       <FontAwesomeIcon icon={faCrown} className="text-yellow-500" />
       <button 
         onClick={handleAddFunds}

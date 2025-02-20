@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { formatNumber } from '@/utils/formatNumber';
 
 interface Profile {
   username: string;
@@ -66,7 +66,7 @@ export const ProfileDisplay = () => {
             <span className="font-bold">Level:</span> {profile.level}
           </div>
           <div className="text-white">
-            <span className="font-bold">Total Wagered:</span> {profile.total_wagered.toLocaleString()}
+            <span className="font-bold">Total Wagered:</span> {formatNumber(profile.total_wagered)}
           </div>
         </div>
       )}
