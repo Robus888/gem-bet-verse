@@ -75,6 +75,30 @@ export type Database = {
         }
         Relationships: []
       }
+      level_rewards: {
+        Row: {
+          amount: number
+          claimed_at: string | null
+          id: number
+          level: number
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          claimed_at?: string | null
+          id?: number
+          level: number
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          claimed_at?: string | null
+          id?: number
+          level?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       players: {
         Row: {
           cash: number | null
@@ -123,6 +147,8 @@ export type Database = {
       wallets: {
         Row: {
           balance: number
+          last_reward_claim: string | null
+          level: number | null
           total_games: number
           total_wagered: number
           updated_at: string
@@ -130,6 +156,8 @@ export type Database = {
         }
         Insert: {
           balance?: number
+          last_reward_claim?: string | null
+          level?: number | null
           total_games?: number
           total_wagered?: number
           updated_at?: string
@@ -137,6 +165,8 @@ export type Database = {
         }
         Update: {
           balance?: number
+          last_reward_claim?: string | null
+          level?: number | null
           total_games?: number
           total_wagered?: number
           updated_at?: string

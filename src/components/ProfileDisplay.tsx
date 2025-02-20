@@ -7,6 +7,7 @@ import { faUser } from '@fortawesome/free-solid-svg-icons';
 interface Profile {
   username: string;
   total_wagered: number;
+  level: number;
 }
 
 export const ProfileDisplay = () => {
@@ -25,14 +26,15 @@ export const ProfileDisplay = () => {
 
         const { data: walletData } = await supabase
           .from('wallets')
-          .select('total_wagered')
+          .select('total_wagered, level')
           .eq('user_id', user.id)
           .single();
 
         if (profileData && walletData) {
           setProfile({
             username: profileData.username,
-            total_wagered: walletData.total_wagered || 0
+            total_wagered: walletData.total_wagered || 0,
+            level: walletData.level || 0
           });
         }
       }
@@ -47,9 +49,12 @@ export const ProfileDisplay = () => {
     <div className="relative">
       <button 
         onClick={() => setShowProfile(!showProfile)}
-        className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-gray-600 transition-colors"
+        className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-gray-600 transition-colors relative"
       >
         <FontAwesomeIcon icon={faUser} className="text-yellow-500" />
+        <span className="absolute -bottom-1 -right-1 bg-yellow-500 text-xs text-gray-900 rounded-full w-5 h-5 flex items-center justify-center">
+          {profile.level}
+        </span>
       </button>
 
       {showProfile && (
@@ -57,8 +62,11 @@ export const ProfileDisplay = () => {
           <div className="text-white mb-2">
             <span className="font-bold">Username:</span> {profile.username}
           </div>
+          <div className="text-white mb-2">
+            <span className="font-bold">Level:</span> {profile.level}
+          </div>
           <div className="text-white">
-            <span className="font-bold">Total Wagered:</span> {profile.total_wagered}
+            <span className="font-bold">Total Wagered:</span> {profile.total_wagered.toLocaleString()}
           </div>
         </div>
       )}

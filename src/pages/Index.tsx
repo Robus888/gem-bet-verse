@@ -6,10 +6,12 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { ProfileDisplay } from '@/components/ProfileDisplay';
 import { AdminPanel } from '@/components/AdminPanel';
+import { LevelRewards } from '@/components/LevelRewards';
 
 const Index = () => {
   const [showCredits, setShowCredits] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [showLevelRewards, setShowLevelRewards] = useState(false);
 
   const handleDiscordClick = () => {
     window.open('https://discord.gg/ekyfYnbA', '_blank');
@@ -99,24 +101,40 @@ const Index = () => {
                 <FontAwesomeIcon icon={faTimes} className="text-gray-400 hover:text-white transition-colors" />
               </button>
             </div>
-            <button 
-              onClick={handleDiscordClick}
-              className="w-full flex items-center space-x-3 px-4 py-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
-            >
-              <svg width="22" height="22" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11.847 1.553A11.323 11.323 0 0 0 9 .667a.06.06 0 0 0-.047.02c-.12.22-.26.506-.353.726-1.06-.16-2.14-.16-3.2 0a6.686 6.686 0 0 0-.36-.726c-.007-.014-.027-.02-.047-.02-1 .173-1.953.473-2.846.886-.007 0-.014.007-.02.014C.313 4.28-.187 6.92.06 9.533c0 .014.007.027.02.034a11.58 11.58 0 0 0 3.493 1.766c.02.007.04 0 .047-.013.267-.367.507-.753.713-1.16.014-.027 0-.053-.026-.06-.38-.147-.74-.32-1.094-.52-.026-.013-.026-.053-.006-.073.073-.054.146-.114.22-.167a.041.041 0 0 1 .046-.007c2.294 1.047 4.767 1.047 7.034 0a.041.041 0 0 1 .046.007c.074.06.147.113.22.173.027.02.027.06-.006.074a7.154 7.154 0 0 1-1.094.52c-.026.006-.033.04-.026.06.213.406.453.793.713 1.16.02.006.04.013.06.006 1.147-.353 2.3-.886 3.5-1.766a.037.037 0 0 0 .02-.034c.293-3.02-.487-5.64-2.067-7.966-.006-.007-.013-.014-.026-.014ZM4.68 7.94c-.687 0-1.26-.633-1.26-1.413s.56-1.414 1.26-1.414c.707 0 1.267.64 1.26 1.414 0 .78-.56 1.413-1.26 1.413Zm4.647 0c-.687 0-1.26-.633-1.26-1.413s.56-1.414 1.26-1.414c.706 0 1.266.64 1.26 1.414 0 .78-.554 1.413-1.26 1.413Z" fill="url(#discord_svg__a)"/>
-                <defs>
-                  <linearGradient id="discord_svg__a" x1="7.001" y1="0.667" x2="7.001" y2="11.336" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#CBB035"/>
-                    <stop offset="1" stopColor="#A1700C"/>
-                  </linearGradient>
-                </defs>
-              </svg>
-              <span>Discord</span>
-            </button>
-            <div className="mb-10"></div>
+            <div className="space-y-4">
+              <button 
+                onClick={handleDiscordClick}
+                className="w-full flex items-center space-x-3 px-4 py-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                <svg width="22" height="22" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11.847 1.553A11.323 11.323 0 0 0 9 .667a.06.06 0 0 0-.047.02c-.12.22-.26.506-.353.726-1.06-.16-2.14-.16-3.2 0a6.686 6.686 0 0 0-.36-.726c-.007-.014-.027-.02-.047-.02-1 .173-1.953.473-2.846.886-.007 0-.014.007-.02.014C.313 4.28-.187 6.92.06 9.533c0 .014.007.027.02.034a11.58 11.58 0 0 0 3.493 1.766c.02.007.04 0 .047-.013.267-.367.507-.753.713-1.16.014-.027 0-.053-.026-.06-.38-.147-.74-.32-1.094-.52-.026-.013-.026-.053-.006-.073.073-.054.146-.114.22-.167a.041.041 0 0 1 .046-.007c2.294 1.047 4.767 1.047 7.034 0a.041.041 0 0 1 .046.007c.074.06.147.113.22.173.027.02.027.06-.006.074a7.154 7.154 0 0 1-1.094.52c-.026.006-.033.04-.026.06.213.406.453.793.713 1.16.02.006.04.013.06.006 1.147-.353 2.3-.886 3.5-1.766a.037.037 0 0 0 .02-.034c.293-3.02-.487-5.64-2.067-7.966-.006-.007-.013-.014-.026-.014ZM4.68 7.94c-.687 0-1.26-.633-1.26-1.413s.56-1.414 1.26-1.414c.707 0 1.267.64 1.26 1.414 0 .78-.56 1.413-1.26 1.413Zm4.647 0c-.687 0-1.26-.633-1.26-1.413s.56-1.414 1.26-1.414c.706 0 1.266.64 1.26 1.414 0 .78-.554 1.413-1.26 1.413Z" fill="url(#discord_svg__a)"/>
+                  <defs>
+                    <linearGradient id="discord_svg__a" x1="7.001" y1="0.667" x2="7.001" y2="11.336" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#CBB035"/>
+                      <stop offset="1" stopColor="#A1700C"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <span>Discord</span>
+              </button>
+              <button 
+                onClick={() => {
+                  setShowMenu(false);
+                  setShowLevelRewards(true);
+                }}
+                className="w-full flex items-center space-x-3 px-4 py-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                <FontAwesomeIcon icon={faCoins} className="text-yellow-500" />
+                <span>Level Rewards</span>
+              </button>
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Level Rewards Modal */}
+      {showLevelRewards && (
+        <LevelRewards onClose={() => setShowLevelRewards(false)} />
       )}
 
       <div className="fixed bottom-0 left-0 right-0 bg-gray-800 p-4 flex justify-around">
