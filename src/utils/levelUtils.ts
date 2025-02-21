@@ -1,7 +1,6 @@
-
 export const calculateLevel = (totalWagered: number): number => {
   const wagerLevels = [
-    { level: 25, wager: 100_000_000_000 }, // 100 billion (level 25)
+    { level: 25, wager: 100_000_000_000 },
     { level: 24, wager: 70_000_000_000 },
     { level: 23, wager: 40_000_000_000 },
     { level: 22, wager: 20_000_000_000 },
@@ -33,11 +32,11 @@ export const calculateLevel = (totalWagered: number): number => {
 };
 
 export const getLevelReward = (level: number): number => {
-  if (level >= 25) return 35_000_000;
-  if (level >= 20) return 30_000_000;
+  if (level >= 25) return 100_000_000; 
+  if (level >= 20) return 50_000_000;
   if (level >= 15) return 25_000_000;
-  if (level >= 10) return 20_000_000;
+  if (level >= 10) return 10_000_000; 
   if (level >= 5) return 2_000_000;
-  if (level >= 1) return 1_000_000;
+  if (level >= 1) return 500_000;
   return 100_000;
 };
