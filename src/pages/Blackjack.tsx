@@ -186,6 +186,9 @@ const Blackjack = () => {
 
     if (newScore > 21) {
       endGame(false);
+    } else if (newScore === 21) {
+      // Automatically win when reaching 21
+      endGame(true);
     }
   };
 

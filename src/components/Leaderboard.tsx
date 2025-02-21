@@ -17,7 +17,7 @@ export const Leaderboard = ({ onClose }: { onClose: () => void }) => {
           user_id,
           total_wagered,
           level,
-          profiles:user_id (
+          profiles (
             username
           )
         `)
@@ -82,17 +82,19 @@ export const Leaderboard = ({ onClose }: { onClose: () => void }) => {
 
         <div className="space-y-2">
           {leaders.map((leader, index) => (
-            <div key={leader.user_id} className="bg-gray-700 p-3 rounded-lg flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <span className="text-gray-400">#{index + 1}</span>
-                <span>{leader.profiles?.username}</span>
+            <div key={leader.user_id} className="bg-gray-700 p-3 rounded-lg">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400">#{index + 1}</span>
+                  <span>{leader.profiles?.username}</span>
+                </div>
+                <span className="font-bold">
+                  {type === 'wager' 
+                    ? formatNumber(leader.total_wagered)
+                    : `Level ${leader.level}`
+                  }
+                </span>
               </div>
-              <span className="font-bold">
-                {type === 'wager' 
-                  ? formatNumber(leader.total_wagered)
-                  : `Level ${leader.level}`
-                }
-              </span>
             </div>
           ))}
         </div>
