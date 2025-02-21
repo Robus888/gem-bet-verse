@@ -130,16 +130,19 @@ export type Database = {
         Row: {
           id: string
           is_admin: boolean | null
+          is_owner: boolean | null
           username: string
         }
         Insert: {
           id: string
           is_admin?: boolean | null
+          is_owner?: boolean | null
           username: string
         }
         Update: {
           id?: string
           is_admin?: boolean | null
+          is_owner?: boolean | null
           username?: string
         }
         Relationships: []
