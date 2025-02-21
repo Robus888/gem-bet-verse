@@ -1,12 +1,15 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faHandPaper, faCrown } from '@fortawesome/free-solid-svg-icons';
 import { supabase } from '@/lib/supabase';
 import { useToast } from "@/hooks/use-toast";
+import { formatNumber, parseInputValue } from '@/utils/formatNumber';
 
 const Coinflip = () => {
-  const [betAmount, setBetAmount] = useState(10);
+  const [betAmount, setBetAmount] = useState(500000);
+  const [betInput, setBetInput] = useState('500K');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -27,8 +30,28 @@ const Coinflip = () => {
     checkAuth();
   }, [navigate]);
 
-  const adjustBet = (multiplier: number) => {
-    setBetAmount(prev => Math.max(10, Math.floor(prev * multiplier)));
+  const handleBetInputChange = (input: string) => {
+    setBetInput(input);
+    try {
+      const value = parseInputValue(input);
+      if (value < 500000) {
+        toast({
+          title: "Invalid bet amount",
+          description: "Minimum bet is 500K",
+          variant: "destructive",
+        });
+        setBetAmount(500000);
+        setBetInput('500K');
+      } else {
+        setBetAmount(value);
+      }
+    } catch (e) {
+      toast({
+        title: "Invalid input",
+        description: "Please enter a valid number with K, M, B, or T suffix",
+        variant: "destructive",
+      });
+    }
   };
 
   const playGame = async () => {
@@ -70,7 +93,8 @@ const Coinflip = () => {
         .from('wallets')
         .update({ 
           balance: wallet.balance - betAmount + wonAmount,
-          total_wagered: (wallet.total_wagered || 0) + betAmount
+          total_wagered: (wallet.total_wagered || 0) + betAmount,
+          level: calculateLevel((wallet.total_wagered || 0) + betAmount)
         })
         .eq('user_id', user.id);
 
@@ -87,7 +111,7 @@ const Coinflip = () => {
 
       toast({
         title: won ? "You won!" : "You lost!",
-        description: won ? `You won ${wonAmount} credits!` : `You lost ${betAmount} credits!`,
+        description: won ? `You won ${formatNumber(wonAmount)} credits!` : `You lost ${formatNumber(betAmount)} credits!`,
         variant: won ? "default" : "destructive",
       });
 
@@ -121,22 +145,35 @@ const Coinflip = () => {
             {isLoading ? 'Flipping...' : 'Flip Coin'}
           </button>
 
-          <div className="text-gray-300 mb-2">Play amount</div>
+          <div className="text-gray-300 mb-2">Play amount (min 500K)</div>
           <div className="bg-gray-700 text-white font-bold py-2 px-4 rounded flex items-center justify-between mb-4">
             <div className="flex items-center">
               <FontAwesomeIcon icon={faCrown} className="text-yellow-500 mr-2" />
-              {betAmount}
+              <input
+                type="text"
+                value={betInput}
+                onChange={(e) => handleBetInputChange(e.target.value)}
+                className="bg-transparent w-24 focus:outline-none"
+              />
             </div>
             <div className="flex items-center">
               <button 
                 className="bg-gray-700 text-gray-500 font-bold py-1 px-2 rounded mr-2 hover:text-gray-400"
-                onClick={() => adjustBet(0.5)}
+                onClick={() => {
+                  const newAmount = Math.max(500000, betAmount / 2);
+                  setBetAmount(newAmount);
+                  setBetInput(formatNumber(newAmount));
+                }}
               >
                 1/2
               </button>
               <button 
                 className="bg-gray-700 text-gray-500 font-bold py-1 px-2 rounded hover:text-gray-400"
-                onClick={() => adjustBet(2)}
+                onClick={() => {
+                  const newAmount = betAmount * 2;
+                  setBetAmount(newAmount);
+                  setBetInput(formatNumber(newAmount));
+                }}
               >
                 2x
               </button>
