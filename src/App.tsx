@@ -8,7 +8,6 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Coinflip from "./pages/Coinflip";
 import Blackjack from "./pages/Blackjack";
-import Upgrader from "./pages/Upgrader";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,7 +23,6 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/coinflip" element={<Coinflip />} />
           <Route path="/blackjack" element={<Blackjack />} />
-          <Route path="/upgrader" element={<Upgrader />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

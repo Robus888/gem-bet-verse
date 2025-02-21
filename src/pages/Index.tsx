@@ -1,4 +1,3 @@
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLink, faHome, faBars, faCoins, faTimes, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { WalletDisplay } from '@/components/WalletDisplay';
@@ -45,7 +44,7 @@ const Index = () => {
 
         <h1 className="text-2xl font-bold mb-4">Popular games</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Link to="/coinflip" className="block">
             <div className="bg-gradient-to-b from-purple-500 to-blue-500 p-4 rounded-lg relative hover:transform hover:scale-105 transition-transform">
               <img
@@ -70,18 +69,6 @@ const Index = () => {
               <h2 className="text-center text-xl font-bold">BLACKJACK</h2>
               <span className="absolute bottom-2 left-2 bg-gray-500 text-white px-2 py-1 rounded-lg">
                 Popular
-              </span>
-            </div>
-          </Link>
-
-          <Link to="/upgrader" className="block">
-            <div className="bg-gradient-to-b from-green-500 to-teal-500 p-4 rounded-lg relative hover:transform hover:scale-105 transition-transform">
-              <div className="mx-auto mb-4 w-24 h-24 flex items-center justify-center bg-teal-600 rounded-full">
-                <FontAwesomeIcon icon={faCoins} className="text-5xl text-yellow-400" />
-              </div>
-              <h2 className="text-center text-xl font-bold">UPGRADER</h2>
-              <span className="absolute bottom-2 left-2 bg-teal-500 text-white px-2 py-1 rounded-lg">
-                New
               </span>
             </div>
           </Link>
