@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -6,6 +5,7 @@ import { faArrowLeft, faHandPaper, faCrown } from '@fortawesome/free-solid-svg-i
 import { supabase } from '@/lib/supabase';
 import { useToast } from "@/hooks/use-toast";
 import { formatNumber, parseInputValue } from '@/utils/formatNumber';
+import { calculateLevel } from '@/utils/levelUtils';
 
 const Coinflip = () => {
   const [betAmount, setBetAmount] = useState(500000);
