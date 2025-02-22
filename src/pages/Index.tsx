@@ -8,6 +8,7 @@ import { ProfileDisplay } from '@/components/ProfileDisplay';
 import { AdminPanel } from '@/components/AdminPanel';
 import { LevelRewards } from '@/components/LevelRewards';
 import { Leaderboard } from '@/components/Leaderboard';
+import { GlobalChat } from '@/components/GlobalChat';
 
 const Index = () => {
   const [showCredits, setShowCredits] = useState(false);
@@ -173,6 +174,7 @@ const Index = () => {
         </button>
         <AdminPanel />
       </div>
+      <GlobalChat />
     </div>
   );
 };

@@ -9,6 +9,60 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      banned_users: {
+        Row: {
+          banned_by: string
+          created_at: string | null
+          id: string
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          banned_by: string
+          created_at?: string | null
+          id?: string
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          banned_by?: string
+          created_at?: string | null
+          id?: string
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          is_tip: boolean | null
+          tip_amount: number | null
+          tip_recipient_id: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          is_tip?: boolean | null
+          tip_amount?: number | null
+          tip_recipient_id?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_tip?: boolean | null
+          tip_amount?: number | null
+          tip_recipient_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       game_history: {
         Row: {
           bet_amount: number
