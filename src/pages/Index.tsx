@@ -1,4 +1,3 @@
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLink, faHome, faBars, faCoins, faTimes, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { WalletDisplay } from '@/components/WalletDisplay';
@@ -9,6 +8,7 @@ import { ProfileDisplay } from '@/components/ProfileDisplay';
 import { AdminPanel } from '@/components/AdminPanel';
 import { LevelRewards } from '@/components/LevelRewards';
 import { Leaderboard } from '@/components/Leaderboard';
+import { GlobalChat } from '@/components/GlobalChat';
 
 const Index = () => {
   const [showCredits, setShowCredits] = useState(false);
@@ -45,7 +45,7 @@ const Index = () => {
 
         <h1 className="text-2xl font-bold mb-4">Popular games</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Link to="/coinflip" className="block">
             <div className="bg-gradient-to-b from-purple-500 to-blue-500 p-4 rounded-lg relative hover:transform hover:scale-105 transition-transform">
               <img
@@ -70,20 +70,6 @@ const Index = () => {
               <h2 className="text-center text-xl font-bold">BLACKJACK</h2>
               <span className="absolute bottom-2 left-2 bg-gray-500 text-white px-2 py-1 rounded-lg">
                 Popular
-              </span>
-            </div>
-          </Link>
-
-          <Link to="/crash" className="block">
-            <div className="bg-gradient-to-b from-green-500 to-blue-500 p-4 rounded-lg relative hover:transform hover:scale-105 transition-transform">
-              <img
-                src="https://storage.googleapis.com/a1aa/image/sFHp57JJ8ynb-cprGCH9MYf1IfliLMo0nEE74UUwjkE.jpg"
-                alt="Crash"
-                className="mx-auto mb-4 w-24 h-24 object-cover rounded-full"
-              />
-              <h2 className="text-center text-xl font-bold">CRASH</h2>
-              <span className="absolute bottom-2 left-2 bg-yellow-500 text-gray-900 px-2 py-1 rounded-lg">
-                New
               </span>
             </div>
           </Link>
@@ -188,6 +174,7 @@ const Index = () => {
         </button>
         <AdminPanel />
       </div>
+      <GlobalChat />
     </div>
   );
 };
