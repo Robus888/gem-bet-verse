@@ -22,6 +22,7 @@ interface ChatMessage {
 
 interface BannedUser {
   user_id: string;
+  reason: string;
 }
 
 export const GlobalChat = () => {
@@ -31,6 +32,7 @@ export const GlobalChat = () => {
   const [tipAmount, setTipAmount] = useState('');
   const [tipMode, setTipMode] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [isBanned, setIsBanned] = useState<BannedUser | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
@@ -41,6 +43,25 @@ export const GlobalChat = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    const checkBanStatus = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: banData } = await supabase
+        .from('banned_users')
+        .select('user_id, reason')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (banData) {
+        setIsBanned(banData);
+      }
+    };
+
+    checkBanStatus();
+  }, []);
 
   useEffect(() => {
     // Fetch initial messages
@@ -116,17 +137,10 @@ export const GlobalChat = () => {
       return;
     }
 
-    // Check if user is banned
-    const { data: bannedData } = await supabase
-      .from('banned_users')
-      .select('user_id')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    if (bannedData) {
+    if (isBanned) {
       toast({
         title: "Error",
-        description: "You are banned from the chat",
+        description: `You have been permanently banned. Reason: ${isBanned.reason}`,
         variant: "destructive",
       });
       return;
@@ -250,45 +264,55 @@ export const GlobalChat = () => {
             <div ref={chatEndRef} />
           </div>
 
-          <div className="p-3 border-t border-gray-700">
-            {tipMode ? (
-              <div className="mb-2 flex items-center space-x-2">
+          {isBanned ? (
+            <div className="p-3 border-t border-gray-700">
+              <div className="text-red-500 text-center">
+                You have been permanently banned.
+                <br />
+                Reason: {isBanned.reason}
+              </div>
+            </div>
+          ) : (
+            <div className="p-3 border-t border-gray-700">
+              {tipMode ? (
+                <div className="mb-2 flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={tipAmount}
+                    onChange={(e) => setTipAmount(e.target.value)}
+                    placeholder="Tip amount"
+                    className="bg-gray-700 text-white px-2 py-1 rounded flex-1"
+                  />
+                  <button
+                    onClick={() => {
+                      setTipMode(false);
+                      setTipAmount('');
+                      setSelectedUserId(null);
+                    }}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <FontAwesomeIcon icon={faTimes} />
+                  </button>
+                </div>
+              ) : null}
+              <div className="flex space-x-2">
                 <input
                   type="text"
-                  value={tipAmount}
-                  onChange={(e) => setTipAmount(e.target.value)}
-                  placeholder="Tip amount"
-                  className="bg-gray-700 text-white px-2 py-1 rounded flex-1"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  placeholder="Type a message..."
+                  className="bg-gray-700 text-white px-3 py-2 rounded flex-1"
                 />
                 <button
-                  onClick={() => {
-                    setTipMode(false);
-                    setTipAmount('');
-                    setSelectedUserId(null);
-                  }}
-                  className="text-gray-400 hover:text-white"
+                  onClick={sendMessage}
+                  className="bg-yellow-500 text-gray-900 px-4 py-2 rounded hover:bg-yellow-400"
                 >
-                  <FontAwesomeIcon icon={faTimes} />
+                  Send
                 </button>
               </div>
-            ) : null}
-            <div className="flex space-x-2">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                placeholder="Type a message..."
-                className="bg-gray-700 text-white px-3 py-2 rounded flex-1"
-              />
-              <button
-                onClick={sendMessage}
-                className="bg-yellow-500 text-gray-900 px-4 py-2 rounded hover:bg-yellow-400"
-              >
-                Send
-              </button>
             </div>
-          </div>
+          )}
         </div>
       ) : (
         <button

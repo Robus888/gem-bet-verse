@@ -12,6 +12,7 @@ export const AdminPanel = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [makeAdmin, setMakeAdmin] = useState(false);
+  const [banReason, setBanReason] = useState('');
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,6 +52,25 @@ export const AdminPanel = () => {
           variant: "destructive",
         });
         return;
+      }
+
+      // If owner is trying to ban user
+      if (userCheck.is_owner && banReason) {
+        const { error: banError } = await supabase
+          .from('banned_users')
+          .insert({
+            user_id: targetUser.id,
+            banned_by: user.id,
+            reason: banReason
+          });
+
+        if (banError) throw banError;
+
+        toast({
+          title: "Success",
+          description: `Banned ${username}`,
+        });
+        setBanReason('');
       }
 
       // If owner is trying to give admin privileges
@@ -170,6 +190,16 @@ export const AdminPanel = () => {
                       onChange={(e) => setLevel(e.target.value)}
                       className="mt-1 block w-full rounded-md bg-gray-700 border-transparent focus:border-gray-500 focus:bg-gray-600 focus:ring-0 text-white"
                       placeholder="Enter level"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300">Ban Reason</label>
+                    <input
+                      type="text"
+                      value={banReason}
+                      onChange={(e) => setBanReason(e.target.value)}
+                      className="mt-1 block w-full rounded-md bg-gray-700 border-transparent focus:border-gray-500 focus:bg-gray-600 focus:ring-0 text-white"
+                      placeholder="Enter ban reason"
                     />
                   </div>
                   <div className="flex items-center">
