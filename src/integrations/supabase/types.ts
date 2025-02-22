@@ -9,60 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      banned_users: {
-        Row: {
-          banned_by: string
-          created_at: string | null
-          id: string
-          reason: string | null
-          user_id: string
-        }
-        Insert: {
-          banned_by: string
-          created_at?: string | null
-          id?: string
-          reason?: string | null
-          user_id: string
-        }
-        Update: {
-          banned_by?: string
-          created_at?: string | null
-          id?: string
-          reason?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      chat_messages: {
-        Row: {
-          content: string
-          created_at: string | null
-          id: string
-          is_tip: boolean | null
-          tip_amount: number | null
-          tip_recipient_id: string | null
-          user_id: string
-        }
-        Insert: {
-          content: string
-          created_at?: string | null
-          id?: string
-          is_tip?: boolean | null
-          tip_amount?: number | null
-          tip_recipient_id?: string | null
-          user_id: string
-        }
-        Update: {
-          content?: string
-          created_at?: string | null
-          id?: string
-          is_tip?: boolean | null
-          tip_amount?: number | null
-          tip_recipient_id?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       game_history: {
         Row: {
           bet_amount: number
@@ -123,6 +69,48 @@ export type Database = {
           creator_choice?: string
           creator_id?: string
           id?: string
+          joiner_id?: string | null
+          status?: string
+          winner_id?: string | null
+        }
+        Relationships: []
+      }
+      jackpot_games: {
+        Row: {
+          completed_at: string | null
+          countdown_end: string | null
+          created_at: string
+          creator_bet: number
+          creator_id: string
+          id: string
+          joined_at: string | null
+          joiner_bet: number | null
+          joiner_id: string | null
+          status: string
+          winner_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          countdown_end?: string | null
+          created_at?: string
+          creator_bet: number
+          creator_id: string
+          id?: string
+          joined_at?: string | null
+          joiner_bet?: number | null
+          joiner_id?: string | null
+          status?: string
+          winner_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          countdown_end?: string | null
+          created_at?: string
+          creator_bet?: number
+          creator_id?: string
+          id?: string
+          joined_at?: string | null
+          joiner_bet?: number | null
           joiner_id?: string | null
           status?: string
           winner_id?: string | null
