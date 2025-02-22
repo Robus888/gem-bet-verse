@@ -7,10 +7,25 @@ import { supabase } from '@/lib/supabase';
 import { useToast } from "@/hooks/use-toast";
 import { formatNumber, parseInputValue } from '@/utils/formatNumber';
 
+// Define the type for jackpot game data
+type JackpotGame = {
+  id: string;
+  creator_id: string;
+  joiner_id: string | null;
+  creator_bet: number;
+  joiner_bet: number | null;
+  winner_id: string | null;
+  created_at: string;
+  joined_at: string | null;
+  countdown_end: string | null;
+  completed_at: string | null;
+  status: 'waiting' | 'playing' | 'completed';
+};
+
 const Jackpot = () => {
   const [betAmount, setBetAmount] = useState(500000);
   const [betInput, setBetInput] = useState('500K');
-  const [activeGame, setActiveGame] = useState<any>(null);
+  const [activeGame, setActiveGame] = useState<JackpotGame | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -35,8 +50,8 @@ const Jackpot = () => {
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'jackpot_games' },
         (payload) => {
-          if (payload.new.status !== 'waiting') {
-            setActiveGame(payload.new);
+          if (payload.new && (payload.new as JackpotGame).status !== 'waiting') {
+            setActiveGame(payload.new as JackpotGame);
           }
         }
       )
