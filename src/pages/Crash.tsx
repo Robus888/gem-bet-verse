@@ -2,30 +2,18 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faCrown } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCrown, faRocket } from '@fortawesome/free-solid-svg-icons';
 import { supabase } from '@/lib/supabase';
 import { useToast } from "@/hooks/use-toast";
 import { formatNumber, parseInputValue } from '@/utils/formatNumber';
+import { CrashGame, CrashBet } from '@/types/crash';
 
-// Define the type for jackpot game data
-type JackpotGame = {
-  id: string;
-  creator_id: string;
-  joiner_id: string | null;
-  creator_bet: number;
-  joiner_bet: number | null;
-  winner_id: string | null;
-  created_at: string;
-  joined_at: string | null;
-  countdown_end: string | null;
-  completed_at: string | null;
-  status: 'waiting' | 'playing' | 'completed';
-};
-
-const Jackpot = () => {
+const Crash = () => {
   const [betAmount, setBetAmount] = useState(500000);
   const [betInput, setBetInput] = useState('500K');
-  const [activeGame, setActiveGame] = useState<JackpotGame | null>(null);
+  const [activeGame, setActiveGame] = useState<CrashGame | null>(null);
+  const [activeBet, setActiveBet] = useState<CrashBet | null>(null);
+  const [currentMultiplier, setCurrentMultiplier] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -44,14 +32,14 @@ const Jackpot = () => {
     };
     checkAuth();
 
-    // Subscribe to jackpot game updates
+    // Subscribe to game and bet updates
     const channel = supabase
-      .channel('jackpot_updates')
+      .channel('crash_updates')
       .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'jackpot_games' },
+        { event: '*', schema: 'public', table: 'crash_games' },
         (payload) => {
-          if (payload.new && (payload.new as JackpotGame).status !== 'waiting') {
-            setActiveGame(payload.new as JackpotGame);
+          if (payload.new) {
+            setActiveGame(payload.new as CrashGame);
           }
         }
       )
@@ -86,7 +74,7 @@ const Jackpot = () => {
     }
   };
 
-  const createGame = async () => {
+  const placeBet = async () => {
     try {
       setIsLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
@@ -108,18 +96,35 @@ const Jackpot = () => {
         return;
       }
 
-      // Create new jackpot game
-      const { data: game, error: gameError } = await supabase
-        .from('jackpot_games')
+      // Check if there's an active game
+      const { data: game } = await supabase
+        .from('crash_games')
+        .select('*')
+        .eq('status', 'waiting')
+        .limit(1)
+        .single();
+
+      if (!game) {
+        toast({
+          title: "No active game",
+          description: "Please wait for the next round",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Place bet
+      const { data: bet, error: betError } = await supabase
+        .from('crash_bets')
         .insert({
-          creator_id: user.id,
-          creator_bet: betAmount,
-          status: 'waiting'
+          user_id: user.id,
+          game_id: game.id,
+          amount: betAmount,
         })
         .select()
         .single();
 
-      if (gameError) throw gameError;
+      if (betError) throw betError;
 
       // Deduct bet amount from wallet
       const { error: walletError } = await supabase
@@ -131,10 +136,10 @@ const Jackpot = () => {
 
       if (walletError) throw walletError;
 
-      setActiveGame(game);
+      setActiveBet(bet);
       toast({
-        title: "Game created!",
-        description: "Waiting for another player to join...",
+        title: "Bet placed!",
+        description: "Good luck!",
       });
     } catch (error: any) {
       toast({
@@ -147,80 +152,42 @@ const Jackpot = () => {
     }
   };
 
-  const joinGame = async () => {
+  const cashOut = async () => {
     try {
       setIsLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!activeBet || !activeGame) return;
 
-      // Check user's balance
-      const { data: wallet } = await supabase
-        .from('wallets')
-        .select('balance')
-        .eq('user_id', user.id)
-        .single();
+      const wonAmount = Math.floor(activeBet.amount * currentMultiplier);
 
-      if (!wallet || wallet.balance < betAmount) {
-        toast({
-          title: "Insufficient balance",
-          description: "Please add more funds to your wallet",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Find available game
-      const { data: availableGame } = await supabase
-        .from('jackpot_games')
-        .select('*')
-        .eq('status', 'waiting')
-        .neq('creator_id', user.id)
-        .order('created_at', { ascending: true })
-        .limit(1)
-        .single();
-
-      if (!availableGame) {
-        toast({
-          title: "No games available",
-          description: "Create a new game instead",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Join the game
-      const now = new Date();
-      const countdown = new Date(now.getTime() + 30000); // 30 seconds countdown
-
-      const { data: game, error: gameError } = await supabase
-        .from('jackpot_games')
+      // Update bet
+      const { error: betError } = await supabase
+        .from('crash_bets')
         .update({
-          joiner_id: user.id,
-          joiner_bet: betAmount,
-          status: 'playing',
-          joined_at: now.toISOString(),
-          countdown_end: countdown.toISOString()
+          cashout_multiplier: currentMultiplier,
+          cashed_out_at: new Date().toISOString(),
+          status: 'won',
+          won_amount: wonAmount,
         })
-        .eq('id', availableGame.id)
+        .eq('id', activeBet.id)
         .select()
         .single();
 
-      if (gameError) throw gameError;
+      if (betError) throw betError;
 
-      // Deduct bet amount from wallet
+      // Add winnings to wallet
       const { error: walletError } = await supabase
         .from('wallets')
-        .update({ 
-          balance: wallet.balance - betAmount,
+        .update({
+          balance: supabase.sql`balance + ${wonAmount}`,
         })
-        .eq('user_id', user.id);
+        .eq('user_id', activeBet.user_id);
 
       if (walletError) throw walletError;
 
-      setActiveGame(game);
+      setActiveBet(null);
       toast({
-        title: "Game joined!",
-        description: "The game will start in 30 seconds...",
+        title: "Cashed out!",
+        description: `You won ${formatNumber(wonAmount)}!`,
       });
     } catch (error: any) {
       toast({
@@ -243,8 +210,8 @@ const Jackpot = () => {
       <div className="flex items-center justify-center min-h-[80vh]">
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-96">
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold">Jackpot</h1>
-            <p className="text-gray-400">Bet against other players</p>
+            <h1 className="text-2xl font-bold">Crash</h1>
+            <p className="text-gray-400">Watch the rocket fly and cash out before it crashes!</p>
           </div>
 
           <div className="text-gray-300 mb-2">Bet amount (min 500K)</div>
@@ -256,6 +223,7 @@ const Jackpot = () => {
                 value={betInput}
                 onChange={(e) => handleBetInputChange(e.target.value)}
                 className="bg-transparent w-24 focus:outline-none"
+                disabled={isLoading || activeBet !== null}
               />
             </div>
             <div className="flex items-center">
@@ -266,6 +234,7 @@ const Jackpot = () => {
                   setBetAmount(newAmount);
                   setBetInput(formatNumber(newAmount));
                 }}
+                disabled={isLoading || activeBet !== null}
               >
                 1/2
               </button>
@@ -276,36 +245,52 @@ const Jackpot = () => {
                   setBetAmount(newAmount);
                   setBetInput(formatNumber(newAmount));
                 }}
+                disabled={isLoading || activeBet !== null}
               >
                 2x
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="text-center mb-4">
+            <div className="text-4xl font-bold mb-2">
+              {currentMultiplier.toFixed(2)}x
+            </div>
+            <FontAwesomeIcon 
+              icon={faRocket} 
+              className="text-yellow-500 text-4xl" 
+              style={{ 
+                transform: `translateY(-${(currentMultiplier - 1) * 20}px)`,
+                transition: 'transform 0.2s ease-out'
+              }} 
+            />
+          </div>
+
+          {activeBet ? (
             <button 
-              className={`bg-yellow-500 text-gray-900 font-bold py-2 px-4 rounded ${
+              className={`w-full bg-green-500 text-white font-bold py-2 px-4 rounded ${
+                isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-400'
+              }`}
+              onClick={cashOut}
+              disabled={isLoading}
+            >
+              Cash Out
+            </button>
+          ) : (
+            <button 
+              className={`w-full bg-yellow-500 text-gray-900 font-bold py-2 px-4 rounded ${
                 isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-yellow-400'
               }`}
-              onClick={createGame}
+              onClick={placeBet}
               disabled={isLoading}
             >
-              Create Game
+              Place Bet
             </button>
-            <button 
-              className={`bg-blue-500 text-white font-bold py-2 px-4 rounded ${
-                isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-400'
-              }`}
-              onClick={joinGame}
-              disabled={isLoading}
-            >
-              Join Game
-            </button>
-          </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-export default Jackpot;
+export default Crash;

@@ -1,3 +1,4 @@
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLink, faHome, faBars, faCoins, faTimes, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { WalletDisplay } from '@/components/WalletDisplay';
@@ -73,14 +74,14 @@ const Index = () => {
             </div>
           </Link>
 
-          <Link to="/jackpot" className="block">
-            <div className="bg-gradient-to-b from-yellow-500 to-red-500 p-4 rounded-lg relative hover:transform hover:scale-105 transition-transform">
+          <Link to="/crash" className="block">
+            <div className="bg-gradient-to-b from-green-500 to-blue-500 p-4 rounded-lg relative hover:transform hover:scale-105 transition-transform">
               <img
                 src="https://storage.googleapis.com/a1aa/image/sFHp57JJ8ynb-cprGCH9MYf1IfliLMo0nEE74UUwjkE.jpg"
-                alt="Jackpot"
+                alt="Crash"
                 className="mx-auto mb-4 w-24 h-24 object-cover rounded-full"
               />
-              <h2 className="text-center text-xl font-bold">JACKPOT</h2>
+              <h2 className="text-center text-xl font-bold">CRASH</h2>
               <span className="absolute bottom-2 left-2 bg-yellow-500 text-gray-900 px-2 py-1 rounded-lg">
                 New
               </span>

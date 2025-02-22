@@ -9,6 +9,74 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      crash_bets: {
+        Row: {
+          amount: number
+          cashed_out_at: string | null
+          cashout_multiplier: number | null
+          created_at: string | null
+          game_id: string
+          id: string
+          status: string
+          user_id: string
+          won_amount: number | null
+        }
+        Insert: {
+          amount: number
+          cashed_out_at?: string | null
+          cashout_multiplier?: number | null
+          created_at?: string | null
+          game_id: string
+          id?: string
+          status?: string
+          user_id: string
+          won_amount?: number | null
+        }
+        Update: {
+          amount?: number
+          cashed_out_at?: string | null
+          cashout_multiplier?: number | null
+          created_at?: string | null
+          game_id?: string
+          id?: string
+          status?: string
+          user_id?: string
+          won_amount?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crash_bets_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "crash_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crash_games: {
+        Row: {
+          completed_at: string | null
+          crash_point: number | null
+          id: string
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          crash_point?: number | null
+          id?: string
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          crash_point?: number | null
+          id?: string
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       game_history: {
         Row: {
           bet_amount: number
@@ -69,48 +137,6 @@ export type Database = {
           creator_choice?: string
           creator_id?: string
           id?: string
-          joiner_id?: string | null
-          status?: string
-          winner_id?: string | null
-        }
-        Relationships: []
-      }
-      jackpot_games: {
-        Row: {
-          completed_at: string | null
-          countdown_end: string | null
-          created_at: string
-          creator_bet: number
-          creator_id: string
-          id: string
-          joined_at: string | null
-          joiner_bet: number | null
-          joiner_id: string | null
-          status: string
-          winner_id: string | null
-        }
-        Insert: {
-          completed_at?: string | null
-          countdown_end?: string | null
-          created_at?: string
-          creator_bet: number
-          creator_id: string
-          id?: string
-          joined_at?: string | null
-          joiner_bet?: number | null
-          joiner_id?: string | null
-          status?: string
-          winner_id?: string | null
-        }
-        Update: {
-          completed_at?: string | null
-          countdown_end?: string | null
-          created_at?: string
-          creator_bet?: number
-          creator_id?: string
-          id?: string
-          joined_at?: string | null
-          joiner_bet?: number | null
           joiner_id?: string | null
           status?: string
           winner_id?: string | null
