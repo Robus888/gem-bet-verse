@@ -1,16 +1,20 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faHandPaper, faCrown } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCrown } from '@fortawesome/free-solid-svg-icons';
 import { supabase } from '@/lib/supabase';
 import { useToast } from "@/hooks/use-toast";
 import { formatNumber, parseInputValue } from '@/utils/formatNumber';
 import { calculateLevel } from '@/utils/levelUtils';
+import CoinAnimation from '@/components/CoinAnimation';
 
 const Coinflip = () => {
   const [betAmount, setBetAmount] = useState(500000);
   const [betInput, setBetInput] = useState('500K');
   const [isLoading, setIsLoading] = useState(false);
+  const [isFlipping, setIsFlipping] = useState(false);
+  const [result, setResult] = useState<'heads' | 'tails' | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -84,19 +88,13 @@ const Coinflip = () => {
 
       if (updateError) throw updateError;
 
-      // Simple 50/50 chance
+      // Determine result and start animation
       const won = Math.random() < 0.5;
-      const wonAmount = won ? betAmount * 2 : 0;
+      const coinResult = won ? 'heads' : 'tails';
+      setResult(coinResult);
+      setIsFlipping(true);
 
-      // Update wallet balance and total wagered
-      await supabase
-        .from('wallets')
-        .update({ 
-          balance: wallet.balance - betAmount + wonAmount,
-          total_wagered: (wallet.total_wagered || 0) + betAmount,
-          level: calculateLevel((wallet.total_wagered || 0) + betAmount)
-        })
-        .eq('user_id', user.id);
+      const wonAmount = won ? betAmount * 2 : 0;
 
       // Record game history
       await supabase
@@ -109,11 +107,23 @@ const Coinflip = () => {
           won_amount: wonAmount
         });
 
-      toast({
-        title: won ? "You won!" : "You lost!",
-        description: won ? `You won ${formatNumber(wonAmount)} credits!` : `You lost ${formatNumber(betAmount)} credits!`,
-        variant: won ? "default" : "destructive",
-      });
+      // Update wallet after animation completes
+      setTimeout(async () => {
+        await supabase
+          .from('wallets')
+          .update({ 
+            balance: wallet.balance - betAmount + wonAmount,
+            total_wagered: (wallet.total_wagered || 0) + betAmount,
+            level: calculateLevel((wallet.total_wagered || 0) + betAmount)
+          })
+          .eq('user_id', user.id);
+
+        toast({
+          title: won ? "You won!" : "You lost!",
+          description: won ? `You won ${formatNumber(wonAmount)} credits!` : `You lost ${formatNumber(betAmount)} credits!`,
+          variant: won ? "default" : "destructive",
+        });
+      }, 3000);
 
     } catch (error: any) {
       toast({
@@ -126,6 +136,10 @@ const Coinflip = () => {
     }
   };
 
+  const handleAnimationComplete = () => {
+    setIsFlipping(false);
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
       <Link to="/" className="inline-flex items-center text-yellow-500 hover:text-yellow-400 mb-4">
@@ -135,18 +149,26 @@ const Coinflip = () => {
 
       <div className="flex items-center justify-center min-h-[80vh]">
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-80">
+          <div className="mb-8">
+            <CoinAnimation
+              isFlipping={isFlipping}
+              result={result}
+              onAnimationComplete={handleAnimationComplete}
+            />
+          </div>
+
           <button 
             className={`bg-yellow-500 text-gray-900 font-bold py-2 px-4 rounded w-full mb-4 ${
-              isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-yellow-400'
+              isLoading || isFlipping ? 'opacity-50 cursor-not-allowed' : 'hover:bg-yellow-400'
             }`}
             onClick={playGame}
-            disabled={isLoading}
+            disabled={isLoading || isFlipping}
           >
-            {isLoading ? 'Flipping...' : 'Flip Coin'}
+            {isLoading ? 'Processing...' : isFlipping ? 'Flipping...' : 'Flip Coin'}
           </button>
 
           <div className="text-gray-300 mb-2">Play amount (min 500K)</div>
-          <div className="bg-gray-700 text-white font-bold py-2 px-4 rounded flex items-center justify-between mb-4">
+          <div className="bg-gray-700 text-white font-bold py-2 px-4 rounded flex items-center justify-between">
             <div className="flex items-center">
               <FontAwesomeIcon icon={faCrown} className="text-yellow-500 mr-2" />
               <input
@@ -154,6 +176,7 @@ const Coinflip = () => {
                 value={betInput}
                 onChange={(e) => handleBetInputChange(e.target.value)}
                 className="bg-transparent w-24 focus:outline-none"
+                disabled={isFlipping}
               />
             </div>
             <div className="flex items-center">
@@ -164,6 +187,7 @@ const Coinflip = () => {
                   setBetAmount(newAmount);
                   setBetInput(formatNumber(newAmount));
                 }}
+                disabled={isFlipping}
               >
                 1/2
               </button>
@@ -174,6 +198,7 @@ const Coinflip = () => {
                   setBetAmount(newAmount);
                   setBetInput(formatNumber(newAmount));
                 }}
+                disabled={isFlipping}
               >
                 2x
               </button>

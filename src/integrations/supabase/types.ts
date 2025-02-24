@@ -9,57 +9,71 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      banned_users: {
+      crash_bets: {
         Row: {
-          banned_by: string
+          amount: number
+          cashed_out_at: string | null
+          cashout_multiplier: number | null
           created_at: string | null
+          game_id: string
           id: string
-          reason: string | null
+          status: string
           user_id: string
+          won_amount: number | null
         }
         Insert: {
-          banned_by: string
+          amount: number
+          cashed_out_at?: string | null
+          cashout_multiplier?: number | null
           created_at?: string | null
+          game_id: string
           id?: string
-          reason?: string | null
+          status?: string
           user_id: string
+          won_amount?: number | null
         }
         Update: {
-          banned_by?: string
+          amount?: number
+          cashed_out_at?: string | null
+          cashout_multiplier?: number | null
           created_at?: string | null
+          game_id?: string
           id?: string
-          reason?: string | null
+          status?: string
           user_id?: string
+          won_amount?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "crash_bets_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "crash_games"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      chat_messages: {
+      crash_games: {
         Row: {
-          content: string
-          created_at: string | null
+          completed_at: string | null
+          crash_point: number | null
           id: string
-          is_tip: boolean | null
-          tip_amount: number | null
-          tip_recipient_id: string | null
-          user_id: string
+          started_at: string | null
+          status: string
         }
         Insert: {
-          content: string
-          created_at?: string | null
+          completed_at?: string | null
+          crash_point?: number | null
           id?: string
-          is_tip?: boolean | null
-          tip_amount?: number | null
-          tip_recipient_id?: string | null
-          user_id: string
+          started_at?: string | null
+          status?: string
         }
         Update: {
-          content?: string
-          created_at?: string | null
+          completed_at?: string | null
+          crash_point?: number | null
           id?: string
-          is_tip?: boolean | null
-          tip_amount?: number | null
-          tip_recipient_id?: string | null
-          user_id?: string
+          started_at?: string | null
+          status?: string
         }
         Relationships: []
       }
