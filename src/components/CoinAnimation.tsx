@@ -4,17 +4,18 @@ import { useState, useEffect } from 'react';
 interface CoinAnimationProps {
   isFlipping: boolean;
   result: 'heads' | 'tails' | null;
+  userChoice: 'crown' | 'star';
   onAnimationComplete: () => void;
 }
 
-const CoinAnimation = ({ isFlipping, result, onAnimationComplete }: CoinAnimationProps) => {
+const CoinAnimation = ({ isFlipping, result, userChoice, onAnimationComplete }: CoinAnimationProps) => {
   const [rotations, setRotations] = useState(0);
 
   useEffect(() => {
     if (isFlipping) {
-      setRotations(prev => prev + 1080 + (result === 'heads' ? 360 : 180)); // 3 full rotations + final position
+      // 3 full rotations + final position based on result
+      setRotations(prev => prev + 1080 + (result === 'heads' ? 360 : 180));
       
-      // Animation duration matches the CSS transition
       const timer = setTimeout(() => {
         onAnimationComplete();
       }, 3000);
@@ -33,14 +34,14 @@ const CoinAnimation = ({ isFlipping, result, onAnimationComplete }: CoinAnimatio
           transform: `rotateY(${rotations}deg)`,
         }}
       >
-        {/* Heads side */}
+        {/* Crown side */}
         <div className="absolute w-full h-full backface-hidden">
           <div className="w-full h-full rounded-full bg-yellow-500 flex items-center justify-center shadow-lg border-4 border-yellow-600">
             <span className="text-4xl">👑</span>
           </div>
         </div>
         
-        {/* Tails side */}
+        {/* Star side */}
         <div 
           className="absolute w-full h-full backface-hidden"
           style={{ transform: 'rotateY(180deg)' }}

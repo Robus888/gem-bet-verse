@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -33,7 +34,7 @@ const SlotsGame = () => {
   const [slots, setSlots] = useState([faCrown, faCrown, faCrown]);
   const [betAmount, setBetAmount] = useState(500000);
   const [betInput, setBetInput] = useState('500K');
-  const [isSpinning, setIsSpinning] = useState(false);
+  const [spinningSlots, setSpinningSlots] = useState([false, false, false]);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -100,7 +101,8 @@ const SlotsGame = () => {
     if (!user) return;
     
     try {
-      setIsSpinning(true);
+      // Start spinning all slots
+      setSpinningSlots([true, true, true]);
 
       // Check user's balance
       const { data: wallet } = await supabase
@@ -115,6 +117,7 @@ const SlotsGame = () => {
           description: "Please add more funds to your wallet",
           variant: "destructive",
         });
+        setSpinningSlots([false, false, false]);
         return;
       }
 
@@ -126,46 +129,57 @@ const SlotsGame = () => {
 
       if (updateError) throw updateError;
 
-      // Generate result after a delay to show animation
+      // Generate results before the animation
+      const newSlots = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
+      
+      // Stop slots one by one
       setTimeout(() => {
-        const newSlots = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
-        setSlots(newSlots);
+        setSlots(slots => [newSlots[0], slots[1], slots[2]]);
+        setSpinningSlots([false, true, true]);
+        
+        setTimeout(() => {
+          setSlots(slots => [slots[0], newSlots[1], slots[2]]);
+          setSpinningSlots([false, false, true]);
+          
+          setTimeout(() => {
+            setSlots(newSlots);
+            setSpinningSlots([false, false, false]);
 
-        // Calculate winnings
-        const winAmount = calculateWinnings(newSlots);
+            // Calculate winnings after all slots have stopped
+            const winAmount = calculateWinnings(newSlots);
 
-        // Record game history
-        supabase
-          .from('game_history')
-          .insert({
-            user_id: user.id,
-            game_type: 'slots',
-            bet_amount: betAmount,
-            result: winAmount > 0 ? 'win' : 'loss',
-            won_amount: winAmount
-          })
-          .then(() => {
-            // Update wallet
-            return supabase
-              .from('wallets')
-              .update({ 
-                balance: wallet.balance - betAmount + winAmount,
-                total_wagered: (wallet.total_wagered || 0) + betAmount,
-                level: calculateLevel((wallet.total_wagered || 0) + betAmount)
+            // Record game history
+            supabase
+              .from('game_history')
+              .insert({
+                user_id: user.id,
+                game_type: 'slots',
+                bet_amount: betAmount,
+                result: winAmount > 0 ? 'win' : 'loss',
+                won_amount: winAmount
               })
-              .eq('user_id', user.id);
-          })
-          .then(() => {
-            if (winAmount > 0) {
-              toast({
-                title: "You won!",
-                description: `You won ${formatNumber(winAmount)} credits!`,
+              .then(() => {
+                // Update wallet
+                return supabase
+                  .from('wallets')
+                  .update({ 
+                    balance: wallet.balance - betAmount + winAmount,
+                    total_wagered: (wallet.total_wagered || 0) + betAmount,
+                    level: calculateLevel((wallet.total_wagered || 0) + betAmount)
+                  })
+                  .eq('user_id', user.id);
+              })
+              .then(() => {
+                if (winAmount > 0) {
+                  toast({
+                    title: "You won!",
+                    description: `You won ${formatNumber(winAmount)} credits!`,
+                  });
+                }
               });
-            }
-          });
-
-        setIsSpinning(false);
-      }, 1500); // Spin for 1.5 seconds
+          }, 1000); // Third slot stops
+        }, 1000); // Second slot stops
+      }, 1000); // First slot stops
 
     } catch (error: any) {
       toast({
@@ -173,7 +187,7 @@ const SlotsGame = () => {
         description: error.message,
         variant: "destructive",
       });
-      setIsSpinning(false);
+      setSpinningSlots([false, false, false]);
     }
   };
 
@@ -189,7 +203,7 @@ const SlotsGame = () => {
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
             <div className="flex justify-center space-x-4 mb-8">
               {slots.map((slot, index) => (
-                <SlotItem key={index} icon={slot} isSpinning={isSpinning} />
+                <SlotItem key={index} icon={slot} isSpinning={spinningSlots[index]} />
               ))}
             </div>
 
@@ -201,7 +215,7 @@ const SlotsGame = () => {
                   value={betInput}
                   onChange={(e) => handleBetInputChange(e.target.value)}
                   className="bg-transparent w-24 focus:outline-none"
-                  disabled={isSpinning}
+                  disabled={spinningSlots.some(s => s)}
                 />
                 <div className="flex items-center space-x-2">
                   <button 
@@ -211,7 +225,7 @@ const SlotsGame = () => {
                       setBetAmount(newAmount);
                       setBetInput(formatNumber(newAmount));
                     }}
-                    disabled={isSpinning}
+                    disabled={spinningSlots.some(s => s)}
                   >
                     1/2
                   </button>
@@ -222,7 +236,7 @@ const SlotsGame = () => {
                       setBetAmount(newAmount);
                       setBetInput(formatNumber(newAmount));
                     }}
-                    disabled={isSpinning}
+                    disabled={spinningSlots.some(s => s)}
                   >
                     2x
                   </button>
@@ -231,12 +245,12 @@ const SlotsGame = () => {
 
               <button 
                 className={`w-full bg-yellow-500 text-gray-900 font-bold py-3 px-4 rounded ${
-                  isSpinning ? 'opacity-50 cursor-not-allowed' : 'hover:bg-yellow-400'
+                  spinningSlots.some(s => s) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-yellow-400'
                 }`}
                 onClick={spin}
-                disabled={isSpinning}
+                disabled={spinningSlots.some(s => s)}
               >
-                {isSpinning ? 'Spinning...' : 'Spin'}
+                {spinningSlots.some(s => s) ? 'Spinning...' : 'Spin'}
               </button>
             </div>
           </div>

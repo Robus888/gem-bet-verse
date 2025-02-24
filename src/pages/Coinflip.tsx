@@ -1,7 +1,8 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faCrown } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCrown, faStar } from '@fortawesome/free-solid-svg-icons';
 import { supabase } from '@/lib/supabase';
 import { useToast } from "@/hooks/use-toast";
 import { formatNumber, parseInputValue } from '@/utils/formatNumber';
@@ -16,6 +17,7 @@ const CoinflipGame = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFlipping, setIsFlipping] = useState(false);
   const [result, setResult] = useState<'heads' | 'tails' | null>(null);
+  const [userChoice, setUserChoice] = useState<'crown' | 'star'>('crown');
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -78,7 +80,10 @@ const CoinflipGame = () => {
       setResult(coinResult);
       setIsFlipping(true);
 
-      const wonAmount = won ? betAmount * 2 : 0;
+      // Check if user won based on their choice
+      const userWon = (userChoice === 'crown' && coinResult === 'heads') || 
+                     (userChoice === 'star' && coinResult === 'tails');
+      const wonAmount = userWon ? betAmount * 2 : 0;
 
       // Record game history
       await supabase
@@ -87,7 +92,7 @@ const CoinflipGame = () => {
           user_id: user.id,
           game_type: 'coinflip',
           bet_amount: betAmount,
-          result: won ? 'win' : 'loss',
+          result: userWon ? 'win' : 'loss',
           won_amount: wonAmount
         });
 
@@ -103,9 +108,9 @@ const CoinflipGame = () => {
           .eq('user_id', user.id);
 
         toast({
-          title: won ? "You won!" : "You lost!",
-          description: won ? `You won ${formatNumber(wonAmount)} credits!` : `You lost ${formatNumber(betAmount)} credits!`,
-          variant: won ? "default" : "destructive",
+          title: userWon ? "You won!" : "You lost!",
+          description: userWon ? `You won ${formatNumber(wonAmount)} credits!` : `You lost ${formatNumber(betAmount)} credits!`,
+          variant: userWon ? "default" : "destructive",
         });
       }, 3000);
 
@@ -137,8 +142,28 @@ const CoinflipGame = () => {
             <CoinAnimation
               isFlipping={isFlipping}
               result={result}
+              userChoice={userChoice}
               onAnimationComplete={handleAnimationComplete}
             />
+          </div>
+
+          <div className="mb-4 flex justify-center space-x-4">
+            <button
+              className={`px-4 py-2 rounded ${userChoice === 'crown' ? 'bg-yellow-500 text-gray-900' : 'bg-gray-700 text-gray-300'}`}
+              onClick={() => setUserChoice('crown')}
+              disabled={isFlipping}
+            >
+              <FontAwesomeIcon icon={faCrown} className="mr-2" />
+              Crown
+            </button>
+            <button
+              className={`px-4 py-2 rounded ${userChoice === 'star' ? 'bg-yellow-500 text-gray-900' : 'bg-gray-700 text-gray-300'}`}
+              onClick={() => setUserChoice('star')}
+              disabled={isFlipping}
+            >
+              <FontAwesomeIcon icon={faStar} className="mr-2" />
+              Star
+            </button>
           </div>
 
           <button 

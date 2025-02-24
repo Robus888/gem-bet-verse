@@ -27,22 +27,6 @@ const Blackjack = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Check authentication
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/auth');
-        toast({
-          title: "Authentication required",
-          description: "Please login to play games",
-          variant: "destructive",
-        });
-      }
-    };
-    checkAuth();
-  }, [navigate]);
-
   const createDeck = () => {
     const suits = ['♠', '♣', '♥', '♦'];
     const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
@@ -273,6 +257,13 @@ const Blackjack = () => {
       {card.value}{card.suit}
     </div>
   );
+
+  useEffect(() => {
+    const initializeGame = async () => {
+      createDeck();
+    };
+    initializeGame();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
