@@ -1,28 +1,52 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, createContext, useContext } from 'react';
 import { supabase } from '@/lib/supabase';
+import { useNavigate } from 'react-router-dom';
 
-export const AuthButton = () => {
+// Create an auth context to share auth state across components
+export const AuthContext = createContext<{
+  user: any;
+  isLoading: boolean;
+}>({ user: null, isLoading: true });
+
+export const useAuth = () => useContext(AuthContext);
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Check current auth status
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
+      setIsLoading(false);
     });
 
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user);
+      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
+  return (
+    <AuthContext.Provider value={{ user, isLoading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const AuthButton = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
   const handleAuth = async () => {
     if (user) {
       await supabase.auth.signOut();
     } else {
-      // Redirect to auth page
-      window.location.href = '/auth';
+      navigate('/auth');
     }
   };
 

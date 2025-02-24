@@ -1,6 +1,5 @@
-
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faCrown } from '@fortawesome/free-solid-svg-icons';
 import { supabase } from '@/lib/supabase';
@@ -8,31 +7,17 @@ import { useToast } from "@/hooks/use-toast";
 import { formatNumber, parseInputValue } from '@/utils/formatNumber';
 import { calculateLevel } from '@/utils/levelUtils';
 import CoinAnimation from '@/components/CoinAnimation';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { useAuth } from '@/components/AuthButton';
 
-const Coinflip = () => {
+const CoinflipGame = () => {
   const [betAmount, setBetAmount] = useState(500000);
   const [betInput, setBetInput] = useState('500K');
   const [isLoading, setIsLoading] = useState(false);
   const [isFlipping, setIsFlipping] = useState(false);
   const [result, setResult] = useState<'heads' | 'tails' | null>(null);
-  const navigate = useNavigate();
   const { toast } = useToast();
-
-  useEffect(() => {
-    // Check authentication
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/auth');
-        toast({
-          title: "Authentication required",
-          description: "Please login to play games",
-          variant: "destructive",
-        });
-      }
-    };
-    checkAuth();
-  }, [navigate]);
+  const { user } = useAuth();
 
   const handleBetInputChange = (input: string) => {
     setBetInput(input);
@@ -61,7 +46,6 @@ const Coinflip = () => {
   const playGame = async () => {
     try {
       setIsLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       // Check user's balance
@@ -209,5 +193,11 @@ const Coinflip = () => {
     </div>
   );
 };
+
+const Coinflip = () => (
+  <ProtectedRoute>
+    <CoinflipGame />
+  </ProtectedRoute>
+);
 
 export default Coinflip;
