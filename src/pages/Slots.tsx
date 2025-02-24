@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,9 +9,11 @@ import { calculateLevel } from '@/utils/levelUtils';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/components/AuthButton';
 
-const SlotItem = ({ icon }: { icon: any }) => (
-  <div className="w-24 h-24 bg-gray-800 rounded-lg flex items-center justify-center text-4xl border-2 border-yellow-500">
-    <FontAwesomeIcon icon={icon} className="text-yellow-500" />
+const SlotItem = ({ icon, isSpinning }: { icon: any; isSpinning: boolean }) => (
+  <div className="w-24 h-24 bg-gray-800 rounded-lg flex items-center justify-center text-4xl border-2 border-yellow-500 overflow-hidden">
+    <div className={`transform ${isSpinning ? 'animate-[spin_0.5s_ease-in-out_infinite]' : ''} transition-all duration-500`}>
+      <FontAwesomeIcon icon={icon} className="text-yellow-500" />
+    </div>
   </div>
 );
 
@@ -125,40 +126,46 @@ const SlotsGame = () => {
 
       if (updateError) throw updateError;
 
-      // Generate result
-      const newSlots = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
-      setSlots(newSlots);
+      // Generate result after a delay to show animation
+      setTimeout(() => {
+        const newSlots = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
+        setSlots(newSlots);
 
-      // Calculate winnings
-      const winAmount = calculateWinnings(newSlots);
+        // Calculate winnings
+        const winAmount = calculateWinnings(newSlots);
 
-      // Record game history
-      await supabase
-        .from('game_history')
-        .insert({
-          user_id: user.id,
-          game_type: 'slots',
-          bet_amount: betAmount,
-          result: winAmount > 0 ? 'win' : 'loss',
-          won_amount: winAmount
-        });
+        // Record game history
+        supabase
+          .from('game_history')
+          .insert({
+            user_id: user.id,
+            game_type: 'slots',
+            bet_amount: betAmount,
+            result: winAmount > 0 ? 'win' : 'loss',
+            won_amount: winAmount
+          })
+          .then(() => {
+            // Update wallet
+            return supabase
+              .from('wallets')
+              .update({ 
+                balance: wallet.balance - betAmount + winAmount,
+                total_wagered: (wallet.total_wagered || 0) + betAmount,
+                level: calculateLevel((wallet.total_wagered || 0) + betAmount)
+              })
+              .eq('user_id', user.id);
+          })
+          .then(() => {
+            if (winAmount > 0) {
+              toast({
+                title: "You won!",
+                description: `You won ${formatNumber(winAmount)} credits!`,
+              });
+            }
+          });
 
-      // Update wallet
-      await supabase
-        .from('wallets')
-        .update({ 
-          balance: wallet.balance - betAmount + winAmount,
-          total_wagered: (wallet.total_wagered || 0) + betAmount,
-          level: calculateLevel((wallet.total_wagered || 0) + betAmount)
-        })
-        .eq('user_id', user.id);
-
-      if (winAmount > 0) {
-        toast({
-          title: "You won!",
-          description: `You won ${formatNumber(winAmount)} credits!`,
-        });
-      }
+        setIsSpinning(false);
+      }, 1500); // Spin for 1.5 seconds
 
     } catch (error: any) {
       toast({
@@ -166,7 +173,6 @@ const SlotsGame = () => {
         description: error.message,
         variant: "destructive",
       });
-    } finally {
       setIsSpinning(false);
     }
   };
@@ -183,7 +189,7 @@ const SlotsGame = () => {
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
             <div className="flex justify-center space-x-4 mb-8">
               {slots.map((slot, index) => (
-                <SlotItem key={index} icon={slot} />
+                <SlotItem key={index} icon={slot} isSpinning={isSpinning} />
               ))}
             </div>
 
